@@ -1,0 +1,305 @@
+1.Description of each of public member functions in each class
+
+
+A.
+
+Game.h and Game.cpp
+//////////////////////////////////////////
+Since there is no class that is inherited from Game, I do not define any virtual and pure virtual function in the Game class
+////////////////////////////////////////// 
+
+
+
+Class Game
+
+Game(int width, int height); 	
+~Game(){ delete stuff; };
+//////////////////////////////////////////
+  This two function are Game class constructor and destructor. Since I allocate a pointer stuff with method that pionts to a piece object, I choose to delete stuff in the destructor to be able to free the memory after the program finish.
+//////////////////////////////////////////
+
+
+
+void play();
+//////////////////////////////////////////
+Mian function that combines other mamber functon to actually play a game
+//////////////////////////////////////////
+
+
+
+bool playOneLevel();
+//////////////////////////////////////////
+return true when player finishes a level and return flase when player quits the game or the tank has been full
+//////////////////////////////////////////
+
+
+
+void displayPrompt(std::string s)
+//////////////////////////////////////////
+Function that shows the words below the tank to inform player the current status, which is "win to continue" or "fail and quit".
+///////////////////////////////////////////
+
+
+
+void displayStatus();
+//////////////////////////////////////////
+function that redisplays the information which are score, level and rows left, on the screen when those information are updated.
+//////////////////////////////////////////
+
+
+
+Tank getmtank()const { return m_tank; }
+	
+Screen getmscreen()const{ return m_screen; }
+//////////////////////////////////////////
+  These are two functions are get function. Since I can't directly access private value in the object, I have to create a get function to be able to get the value or object that is stored in the private part. 
+  First one returns the tank object.
+  econd one returns the Screen object.  
+//////////////////////////////////////////
+
+
+
+int getdigits(int num)const;
+//////////////////////////////////////////
+   This is a helper function that can show how many digits the input num has. I create this because I need make palyerscore,level and rows left right-justified in a 7 characters space. Therefore if I get those number's digits, I will know how many blank I need to fill before those numbers to make a stable 7 characters. 
+//////////////////////////////////////////
+
+
+void moveanddisplay(piece* & stuf, Tank& mtank, Screen & mscreen, char command);
+//////////////////////////////////////////
+  This function gets a command that tells which direction the piece should move or if the piece stays or rotates. Than this function will call the corresponding move function to make the piece move as the command says and then copy the piece into the tank and clear the former copyed piece and redisplay the tank, which makes people feel like that the piece actually moves in the tank.
+////////////////////////////////////////// 
+
+
+void displaynextpiece(PieceType shape);
+////////////////////////////////////////// 
+This function gets a command 'shape' that tells which type of piece are supposed to show in the area "next piece" and then redisplay the corresponding piece on the screen. 
+////////////////////////////////////////// 
+
+
+void setshape()
+////////////////////////////////////////// 
+set the pointer stuff to point to a new piece object that should be the current piece move into the tank. 
+//////////////////////////////////////////
+
+
+
+bool checkboundary(char direction);
+
+//////////////////////////////////////////
+This function checks the specific space around the current piece. The specific space depends on the input direction.Return ture if the checked space is safe to move to or  not out ot the tank's boundary, otherwise return false.
+//////////////////////////////////////////
+
+
+
+bool checkrorate();
+//////////////////////////////////////////
+This function checks the tank's space that is occupied by the current piece if the piece rotated once.Return true if the space occupied by the piece after that action will not overlap with any other existing pieces or will not be out of tank's boundary, otherwise return false.
+//////////////////////////////////////////
+
+
+void scorechange();
+//////////////////////////////////////////
+This function will call tank's member function checkallrows() to  clear the full rows and shift all rows above down until they are supposed to stop.Also this function will 
+change the palyer score based on the number of rows cleard returned from the checkallrows() and redisplay this score on the screen
+//////////////////////////////////////////
+
+bool checkoverlap();
+//////////////////////////////////////////
+This function checks whether the current piece's occupied space overlaps with other existing pieces or not. Return true if overlap, otherwise return false. 
+//////////////////////////////////////////
+
+
+
+void specialexcute();
+//////////////////////////////////////////
+A choice function that gets the current piece object's type from its gettype() and then  calls the corresponding special action function to do the special action of the current piece. 
+//////////////////////////////////////////
+
+
+bool fillblank(int cr, int cc,int sr,int sc);
+
+//////////////////////////////////////////
+Function that fills the blanks near the FoamBomb with "*" recursively until reaches the boundry.
+
+//////////////////////////////////////////
+
+B. 
+
+Tank.h and Tank.cpp
+
+//////////////////////////////////////////
+Since there is no class that is inherited from Tank, I do not define any virtual and pure virtual function in the Tank class
+////////////////////////////////////////// 
+
+
+
+Class Tank
+
+Tank(const int w,const int h);
+~Tank(){};
+//////////////////////////////////////////
+These are Tank class' copy constrctor and destructor
+////////////////////////////////////////// 
+
+
+void cleartank()
+//////////////////////////////////////////
+This function will clear all inside the tank
+//////////////////////////////////////////
+
+
+void display(Screen& screen, int x, int y) const;
+//////////////////////////////////////////
+This function will display the tank and everthing inside the tank currently on the screen with the upper left of the tank located on the coordinates (x,y)
+//////////////////////////////////////////
+
+
+
+void setcoord(int x, int y, char symbol);
+//////////////////////////////////////////
+Usually I need to change the private member tank's value outside of the tank class, so I create this member function to be able to modify tank wherever it is necessary.
+//////////////////////////////////////////
+
+
+bool checkonerow(int row) const;
+	
+void shiftabovedown(int row);
+	
+int checkallrow();
+//////////////////////////////////////////
+These three functions are created separately, however all of the three combines together to act as checking and clearing the full rows in the tank. I saperate them because I want to divide the overall complex clear-rows action into some clear and small parts, which will be easy for me to check and modify my code. checkallrow() will creates a loop to call checkonerow() again and again to check if each of rows in the tank is full or not and also will call shiftabovedown() to shift rows above down once when checkonerow() find a row which is full. During this action, checkallrow() will record and return how many times shiftabovedown() gets called, which is just the number of rows that have been cleared.
+
+//////////////////////////////////////////
+
+
+
+int getw() const{ return twidth; }
+	
+int geth() const { return theight; }
+	
+char gettankchar(int r, int c) const{ return tank[r][c]; };
+//////////////////////////////////////////
+These are three functions are get function. Since I can't directly access private value in the object, I have to create a get function to be able to get the value or object that is stored in the private part. 
+  First one returns the tank's width.
+  Second one returns the tank's height.
+  Third one returns the tank's specific character value with input row and cloumn 
+//////////////////////////////////////////
+
+
+C. 
+
+
+piece.h and piece.cpp
+//////////////////////////////////////////
+I create a base class Piece and also I create 7 derived calss that have their own special actions. 
+//////////////////////////////////////////
+
+
+
+Class Piece
+
+piece(char ty);
+virtual ~piece(){};
+//////////////////////////////////////////
+first one is a piece class constructor
+second one is Piece class deatructor. I choose to make piece destructor virtual, since when I create base class type derived class object, I can call both of base class' and derived class' destructor, which will make destroy operation complete.
+//////////////////////////////////////////
+
+
+void down();  
+void left() ;
+void right() ;
+//////////////////////////////////////////
+This three function will make the piece move one step to the specific direction.
+//////////////////////////////////////////
+
+
+
+void unexcute(Tank& tank);
+void excute(Tank& tank);
+void stay(Tank& tank);
+//////////////////////////////////////////
+this three function will change the character value of the tank at a specific coordinates . Also the specific coordinates is the moveing piece's coordinates stored in its private member coords. Actually I do not print the moving piece on the screen again and again to act as it is moving, however I change the tank's value at the current piece's coordinats and print the tank again again to act as the piece is moving.   
+  First one is to make tank's character value at the piece's coordinats change to ' '
+  second one is to make tank's character value at the piece's coordinats change to '#'
+  Third one is to make tank's character value at the piece's coordinats change to '$';
+//////////////////////////////////////////
+
+
+virtual void roration()=0;
+//////////////////////////////////////////
+this is piece rotation function. I define it as pure virtual function, since all different pieces rotate, however they rotate in their own way. Since piece does't have a rotate method unless its special type is defined, base piece type is not special and its rotate method is undefined, so I choose to define this funtion as "pure" virtual function.
+//////////////////////////////////////////
+
+
+void icoords(int i, char l, int v);
+void dcoords(int i, char l, int v);
+void orientp1() { orientation++; };
+//////////////////////////////////////////
+These three function is for me to modify this class object's private member outside of this class public member function.
+//////////////////////////////////////////
+
+
+int getorient() const { return orientation; };
+coord getcoords(int i) const{ return coords[i]; };
+char gettype() const { return type; };
+//////////////////////////////////////////
+These three function is for me to access this class type object's private member outside of its public member function.
+//////////////////////////////////////////
+
+
+void copy();
+void back();
+//////////////////////////////////////////
+I creates a temp array that records the piece object's coordinates coords in case for some special situation. And This copy() will copy coords' value to the temp array. back() will return the copyed value in the temp array to the coords again.  
+//////////////////////////////////////////
+
+
+
+Derived class defination
+//////////////////////////////////////////
+The rest classes such as "I_piece" and "J_piece" are all derived classes inherited from the base class piece.
+They all have constructor and destructor.
+Also they all have their own rotation function, which will do their own rotation.
+I do not define any private members in the derived classes, since there is no need to do it.
+//////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Since now my program works just fine, I do not have any incomplete function and any functionality failed to finish.
+
+
+
+
+3. 
+
+I think the most important design decision or assumption I made is that I do not print piece again and again on the screen to show it is moving, however I modify tank's value at the piece's coordinates again and again and reprint the whole tank again and again to show that the piece is moving. 
+
+
+I choose to create 2-d vector to record Tank's value, since it is easier to modify and clear than using the dynamic allocated array.
+
+
+
+
+
+
+
+
+
+
+
+
